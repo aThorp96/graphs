@@ -61,15 +61,15 @@ func NewGraphFromFile(filepath string) *graph {
 }
 
 /**
-* Constructor sets up the adjacency lists for a graph
-*       from a file.  The file is in the format
-*       first entry: the number of vertices
-*       subsequent entries: pairs of vertices
-*               representing the edges followed
-                by the weight of the vertex pair edge
-*
-* @param filename  name of the input file
-*/
+ * Constructor sets up the adjacency lists for a graph
+ *       from a file.  The file is in the format
+ *       first entry: the number of vertices
+ *       subsequent entries: pairs of vertices
+ *               representing the edges followed
+ *               by the weight of the vertex pair edge
+ *
+ * @param filename  name of the input file
+ */
 func NewWeightedGraphFromFile(filepath string) *graph {
 	g := new(graph)
 	g.readWeightedFromFile(filepath)
@@ -151,10 +151,10 @@ func (g *graph) readWeightedFromFile(filepath string) {
 }
 
 /**
-* Accessor for the degree of a vertex.
-*
-* @param   i  vertex in the graph
-* @return  degree of vertex i
+ * Accessor for the degree of a vertex.
+ *
+ * @param   i  vertex in the graph
+ * @return  degree of vertex i
  */
 func (g *graph) Degree(i int) int {
 	return g.degrees[i]
@@ -197,11 +197,11 @@ func (g *graph) AddEdgeWeight(vertex1, vertex2 int, weight int) {
 }
 
 /**
-* Accessor for the connectivity of two vertices.
-*
-* @param   vertex1  vertex in the graph
-* @param   vertex2  vertex in the graph
-* @return  whether or not the vertices are connected
+ * Accessor for the connectivity of two vertices.
+ *
+ * @param   vertex1  vertex in the graph
+ * @param   vertex2  vertex in the graph
+ * @return  whether or not the vertices are connected
  */
 func (g *graph) IsConnected(vertex1, vertex2 int) bool {
 	if vertex1 > vertex2 {
@@ -213,12 +213,12 @@ func (g *graph) IsConnected(vertex1, vertex2 int) bool {
 }
 
 /**
-* Accessor for the weight of an edge.
-*
-* @param   vertex1  vertex in the graph
-* @param   vertex2  vertex in the graph
-* @return  the weight of the connected edge
-*          if there is no connection -999
+ * Accessor for the weight of an edge.
+ *
+ * @param   vertex1  vertex in the graph
+ * @param   vertex2  vertex in the graph
+ * @return  the weight of the connected edge
+ *          if there is no connection -999
  */
 func (g *graph) Weight(vertex1, vertex2 int) int {
 	if vertex2 > vertex1 {
@@ -250,6 +250,14 @@ func (g *graph) Order() int {
 func (g *graph) Size() int {
 	return g.numEdges
 }
+
+/**
+ * Accessor for edges of a vertex
+ *
+ * @param the vertex whos edges are to be retrieved
+ *
+ * @return the adjacency list of vertex
+ */
 
 /**
  * Removes all edges from the graph.
