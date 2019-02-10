@@ -4,6 +4,6 @@ graphs is a graph package for working with graph problems and algorithms. Curren
 Original implemented by Dr. Alice McRae, I ported to Go for my own studies. Pull requests accepted.
 
 
-#TODO
+# TODO
 - Add support for directional edges
 - Add bounds checking on vertex entries
