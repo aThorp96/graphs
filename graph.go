@@ -61,6 +61,22 @@ func NewGraphFromFile(filepath string) *graph {
 }
 
 /**
+* Constructor sets up the adjacency lists for a graph
+*       from a file.  The file is in the format
+*       first entry: the number of vertices
+*       subsequent entries: pairs of vertices
+*               representing the edges followed
+                by the weight of the vertex pair edge
+*
+* @param filename  name of the input file
+*/
+func NewWeightedGraphFromFile(filepath string) *graph {
+	g := new(graph)
+	g.readWeightedFromFile(filepath)
+	return g
+}
+
+/**
  * Inputs adjacency lists from a file.
  *
  * @param filename  name of the input file
@@ -89,6 +105,44 @@ func (g *graph) readFromFile(filepath string) {
 		f.Scan()
 		vertex2, err = strconv.Atoi(f.Text())
 		g.AddEdge(vertex1, vertex2)
+
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+}
+
+/**
+ * Inputs adjacency lists from a file.
+ *
+ * @param filename  name of the input file
+ *
+ *       Reads the number of vertices and
+ *       each edge from a file.  The file format is
+ *       first entry: the number of vertices
+ *       subsequent entries: pairs of vertices
+ *                          representing the edges.
+ */
+func (g *graph) readWeightedFromFile(filepath string) {
+
+	f := bufio.NewScanner(strings.NewReader(filepath))
+	f.Split(bufio.ScanWords)
+
+	var vertex1, vertex2, weight int
+	var err error
+
+	f.Scan()
+	g.numVertices, err = strconv.Atoi(f.Text())
+	g.Clear()
+
+	for b, _ := strconv.Atoi(f.Text()); b >= 0; {
+		f.Scan()
+		vertex1, err = strconv.Atoi(f.Text())
+		f.Scan()
+		vertex2, err = strconv.Atoi(f.Text())
+		f.Scan()
+		weight, err = strconv.Atoi(f.Text())
+		g.AddEdgeWeight(vertex1, vertex2, weight)
 
 		if err != nil {
 			fmt.Println(err)
