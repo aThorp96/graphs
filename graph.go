@@ -25,6 +25,8 @@ import (
 type graph struct {
 	// directed    bool // TODO: add directed functionality
 	adjacencies [][]bool // adjacency matrix
+	edges       [][]int  // adjacency list
+	weights     [][]int  // adjacency list
 	degrees     []int
 	numVertices int
 	numEdges    int
@@ -114,14 +116,29 @@ func (g *graph) Degree(i int) int {
  * vertice's list
  */
 func (g *graph) AddEdge(vertex1, vertex2 int) {
+	g.AddEdgeWeight(vertex1, vertex2, 1)
+}
+
+/**
+ * Adds an edge uv to an undirected graph.
+ *
+ * @param vertex1  one endpoint
+ * @param vertex2  one endpoint
+ *
+ * The smaller of the inputs is added to the larger
+ * vertice's list
+ */
+func (g *graph) AddEdgeWeight(vertex1, vertex2 int, weight int) {
 	g.numEdges++
 	g.degrees[vertex1]++
 	g.degrees[vertex2]++
 
 	if vertex1 > vertex2 {
 		g.adjacencies[vertex1][vertex2] = true
+		g.weights[vertex1][vertex2] = weight
 	} else {
 		g.adjacencies[vertex2][vertex1] = true
+		g.weights[vertex2][vertex1] = weight
 	}
 }
 
@@ -132,12 +149,33 @@ func (g *graph) AddEdge(vertex1, vertex2 int) {
 * @param   vertex2  vertex in the graph
 * @return  whether or not the vertices are connected
  */
-func (g *graph) IsEdge(vertex1, vertex2 int) bool {
+func (g *graph) IsConnected(vertex1, vertex2 int) bool {
 	if vertex1 > vertex2 {
 		return g.adjacencies[vertex1][vertex2]
 	} else {
 		return g.adjacencies[vertex2][vertex1]
 
+	}
+}
+
+/**
+* Accessor for the weight of an edge.
+*
+* @param   vertex1  vertex in the graph
+* @param   vertex2  vertex in the graph
+* @return  the weight of the connected edge
+*          if there is no connection -999
+ */
+func (g *graph) Weight(vertex1, vertex2 int) int {
+	if vertex2 > vertex1 {
+		temp := vertex1
+		vertex1 = vertex2
+		vertex2 = temp
+	}
+	if g.adjacencies[vertex1][vertex2] {
+		return g.weights[vertex1][vertex2]
+	} else {
+		return -999
 	}
 }
 
@@ -164,9 +202,15 @@ func (g *graph) Size() int {
  */
 func (g *graph) Clear() {
 	g.numEdges = 0
+
 	g.degrees = make([]int, g.numVertices)
 	g.adjacencies = make([][]bool, g.numVertices)
+	g.edges = make([][]int, g.numVertices)
+	g.weights = make([][]int, g.numVertices)
+
 	for i := 0; i < g.numVertices; i++ {
 		g.adjacencies[i] = make([]bool, g.numVertices)
+		g.edges[i] = make([]int, g.numVertices)
+		g.weights[i] = make([]int, g.numVertices)
 	}
 }
