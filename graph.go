@@ -187,13 +187,15 @@ func (g *graph) AddEdgeWeight(vertex1, vertex2 int, weight int) {
 	g.degrees[vertex1]++
 	g.degrees[vertex2]++
 
-	if vertex1 > vertex2 {
-		g.adjacencies[vertex1][vertex2] = true
-		g.weights[vertex1][vertex2] = weight
-	} else {
-		g.adjacencies[vertex2][vertex1] = true
-		g.weights[vertex2][vertex1] = weight
+	if vertex1 < vertex2 {
+		temp := vertex1
+		vertex1 = vertex2
+		vertex2 = temp
 	}
+	g.adjacencies[vertex1][vertex2] = true
+	g.weights[vertex1][vertex2] = weight
+	g.edges[vertex1] = append(g.edges[vertex1], vertex2)
+
 }
 
 /**
@@ -258,6 +260,9 @@ func (g *graph) Size() int {
  *
  * @return the adjacency list of vertex
  */
+func (g *graph) GetEdges(vertex int) []int {
+	return g.edges[vertex]
+}
 
 /**
  * Removes all edges from the graph.
