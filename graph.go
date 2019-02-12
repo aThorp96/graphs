@@ -195,23 +195,24 @@ func (g *Undirected) AddEdge(vertex1, vertex2 int) {
  * vertice's list
  */
 func (g *Undirected) AddEdgeWeight(vertex1, vertex2 int, weight int) {
-	g.numEdges++
-	g.degrees[vertex1]++
-	g.degrees[vertex2]++
+    if !g.IsConnected(vertex1, vertex2) {
+    	g.numEdges++
+    	g.degrees[vertex1]++
+    	g.degrees[vertex2]++
 
-	// inforce vertex1 > vertex2
-	if vertex1 < vertex2 {
-		temp := vertex1
-		vertex1 = vertex2
-		vertex2 = temp
-	}
+    	// inforce vertex1 > vertex2
+    	if vertex1 < vertex2 {
+    		temp := vertex1
+    		vertex1 = vertex2
+    		vertex2 = temp
+    	}
 
-	// update
-	g.adjacencies[vertex1][vertex2] = true
-	g.weights[vertex1][vertex2] = weight
-	g.edges[vertex1] = append(g.edges[vertex1], vertex2)
-	g.edges[vertex2] = append(g.edges[vertex2], vertex1)
-
+    	// update
+    	g.adjacencies[vertex1][vertex2] = true
+    	g.weights[vertex1][vertex2] = weight
+    	g.edges[vertex1] = append(g.edges[vertex1], vertex2)
+    	g.edges[vertex2] = append(g.edges[vertex2], vertex1)
+    }
 }
 
 /**
