@@ -3,6 +3,7 @@ package graphs
 import (
 	"bufio"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	//"io"
@@ -12,8 +13,8 @@ import (
  * graph is an implementation of an undirected graph.
  *
  * @author Alice McRae
- * ported to Go by
- * @author Andrew Thorp
+ * ported to Go by Andrew Thorp
+ *
  * @version 08 February 2019
  *
  *      Vertices are labeled 0..n-1, where n is
@@ -22,7 +23,7 @@ import (
  *      An edge between verteces x and y is denoted
  *      as adjacencies[x][y] = true, where x > y
  */
-type graph struct {
+type Undirected struct {
 	// directed    bool // TODO: add directed functionality
 	adjacencies [][]bool // adjacency matrix
 	edges       [][]int  // adjacency list
@@ -38,8 +39,8 @@ type graph struct {
  *
  * @param num  number of vertices in the graph
  */
-func NewGraph(numVertices int) *graph {
-	g := new(graph)
+func NewGraph(numVertices int) *Undirected {
+	g := new(Undirected)
 	g.numVertices = numVertices
 	g.Clear()
 	return g
@@ -54,8 +55,9 @@ func NewGraph(numVertices int) *graph {
  *
  * @param filename  name of the input file
  */
-func NewGraphFromFile(filepath string) *graph {
-	g := new(graph)
+func NewGraphFromFile(filepath string) *Undirected {
+	g := new(Undirected)
+	g.Clear()
 	g.readFromFile(filepath)
 	return g
 }
@@ -70,8 +72,9 @@ func NewGraphFromFile(filepath string) *graph {
  *
  * @param filename  name of the input file
  */
-func NewWeightedGraphFromFile(filepath string) *graph {
-	g := new(graph)
+func NewWeightedGraphFromFile(filepath string) *Undirected {
+	g := new(Undirected)
+	g.Clear()
 	g.readWeightedFromFile(filepath)
 	return g
 }
@@ -87,27 +90,36 @@ func NewWeightedGraphFromFile(filepath string) *graph {
  *       subsequent entries: pairs of vertices
  *                          representing the edges.
  */
-func (g *graph) readFromFile(filepath string) {
-
-	f := bufio.NewScanner(strings.NewReader(filepath))
+func (g *Undirected) readFromFile(filepath string) {
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	f := bufio.NewScanner(file)
 	f.Split(bufio.ScanWords)
 
-	var vertex1, vertex2 int
-	var err error
+	var vertex2 int
 
 	f.Scan()
 	g.numVertices, err = strconv.Atoi(f.Text())
 	g.Clear()
 
-	for b, _ := strconv.Atoi(f.Text()); b >= 0; {
+	for vertex1, _ := strconv.Atoi(f.Text()); vertex1 >= 0; {
+
 		f.Scan()
 		vertex1, err = strconv.Atoi(f.Text())
-		f.Scan()
-		vertex2, err = strconv.Atoi(f.Text())
-		g.AddEdge(vertex1, vertex2)
-
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		f.Scan()
+		vertex2, err = strconv.Atoi(f.Text())
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if vertex1 >= 0 && vertex2 >= 0 {
+			g.AddEdge(vertex1, vertex2)
 		}
 	}
 }
@@ -123,7 +135,7 @@ func (g *graph) readFromFile(filepath string) {
  *       subsequent entries: pairs of vertices
  *                          representing the edges.
  */
-func (g *graph) readWeightedFromFile(filepath string) {
+func (g *Undirected) readWeightedFromFile(filepath string) {
 
 	f := bufio.NewScanner(strings.NewReader(filepath))
 	f.Split(bufio.ScanWords)
@@ -156,7 +168,7 @@ func (g *graph) readWeightedFromFile(filepath string) {
  * @param   i  vertex in the graph
  * @return  degree of vertex i
  */
-func (g *graph) Degree(i int) int {
+func (g *Undirected) Degree(i int) int {
 	return g.degrees[i]
 }
 
@@ -169,7 +181,7 @@ func (g *graph) Degree(i int) int {
  * The smaller of the inputs is added to the larger
  * vertice's list
  */
-func (g *graph) AddEdge(vertex1, vertex2 int) {
+func (g *Undirected) AddEdge(vertex1, vertex2 int) {
 	g.AddEdgeWeight(vertex1, vertex2, 1)
 }
 
@@ -182,19 +194,23 @@ func (g *graph) AddEdge(vertex1, vertex2 int) {
  * The smaller of the inputs is added to the larger
  * vertice's list
  */
-func (g *graph) AddEdgeWeight(vertex1, vertex2 int, weight int) {
+func (g *Undirected) AddEdgeWeight(vertex1, vertex2 int, weight int) {
 	g.numEdges++
 	g.degrees[vertex1]++
 	g.degrees[vertex2]++
 
+	// inforce vertex1 > vertex2
 	if vertex1 < vertex2 {
 		temp := vertex1
 		vertex1 = vertex2
 		vertex2 = temp
 	}
+
+	// update
 	g.adjacencies[vertex1][vertex2] = true
 	g.weights[vertex1][vertex2] = weight
 	g.edges[vertex1] = append(g.edges[vertex1], vertex2)
+	g.edges[vertex2] = append(g.edges[vertex2], vertex1)
 
 }
 
@@ -205,7 +221,7 @@ func (g *graph) AddEdgeWeight(vertex1, vertex2 int, weight int) {
  * @param   vertex2  vertex in the graph
  * @return  whether or not the vertices are connected
  */
-func (g *graph) IsConnected(vertex1, vertex2 int) bool {
+func (g *Undirected) IsConnected(vertex1, vertex2 int) bool {
 	if vertex1 > vertex2 {
 		return g.adjacencies[vertex1][vertex2]
 	} else {
@@ -222,7 +238,7 @@ func (g *graph) IsConnected(vertex1, vertex2 int) bool {
  * @return  the weight of the connected edge
  *          if there is no connection -999
  */
-func (g *graph) Weight(vertex1, vertex2 int) int {
+func (g *Undirected) Weight(vertex1, vertex2 int) int {
 	if vertex2 > vertex1 {
 		temp := vertex1
 		vertex1 = vertex2
@@ -240,7 +256,7 @@ func (g *graph) Weight(vertex1, vertex2 int) int {
  *
  * @return  number of vertices in the graph
  */
-func (g *graph) Order() int {
+func (g *Undirected) Order() int {
 	return g.numVertices
 }
 
@@ -249,7 +265,7 @@ func (g *graph) Order() int {
  *
  * @return  number of edges in the graph
  */
-func (g *graph) Size() int {
+func (g *Undirected) Size() int {
 	return g.numEdges
 }
 
@@ -260,14 +276,14 @@ func (g *graph) Size() int {
  *
  * @return the adjacency list of vertex
  */
-func (g *graph) GetEdges(vertex int) []int {
+func (g *Undirected) GetEdges(vertex int) []int {
 	return g.edges[vertex]
 }
 
 /**
  * Removes all edges from the graph.
  */
-func (g *graph) Clear() {
+func (g *Undirected) Clear() {
 	g.numEdges = 0
 
 	g.degrees = make([]int, g.numVertices)
@@ -277,7 +293,7 @@ func (g *graph) Clear() {
 
 	for i := 0; i < g.numVertices; i++ {
 		g.adjacencies[i] = make([]bool, g.numVertices)
-		g.edges[i] = make([]int, g.numVertices)
+		g.edges[i] = []int{}
 		g.weights[i] = make([]int, g.numVertices)
 	}
 }
