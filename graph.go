@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
-	//"io"
 )
 
 /**
@@ -136,28 +134,42 @@ func (g *Undirected) readFromFile(filepath string) {
  *                          representing the edges.
  */
 func (g *Undirected) readWeightedFromFile(filepath string) {
-
-	f := bufio.NewScanner(strings.NewReader(filepath))
+	file, err := os.Open(filepath)
+	if err != nil {
+		fmt.Println(err)
+	}
+	f := bufio.NewScanner(file)
 	f.Split(bufio.ScanWords)
 
-	var vertex1, vertex2, weight int
-	var err error
+	var vertex2, weight int
 
 	f.Scan()
 	g.numVertices, err = strconv.Atoi(f.Text())
 	g.Clear()
 
-	for b, _ := strconv.Atoi(f.Text()); b >= 0; {
+	for vertex1, _ := strconv.Atoi(f.Text()); vertex1 >= 0; {
+
 		f.Scan()
 		vertex1, err = strconv.Atoi(f.Text())
-		f.Scan()
-		vertex2, err = strconv.Atoi(f.Text())
-		f.Scan()
-		weight, err = strconv.Atoi(f.Text())
-		g.AddEdgeWeight(vertex1, vertex2, weight)
-
 		if err != nil {
 			fmt.Println(err)
+		}
+
+		f.Scan()
+		vertex2, err = strconv.Atoi(f.Text())
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		f.Scan()
+		weight, err = strconv.Atoi(f.Text())
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		if vertex1 >= 0 && vertex2 >= 0 {
+    		fmt.Printf("vertex1: %d, vertex 2: %d, weight: %d\n", vertex1, vertex2, weight)
+			g.AddEdgeWeight(vertex1, vertex2, weight)
 		}
 	}
 }
@@ -210,6 +222,7 @@ func (g *Undirected) AddEdgeWeight(vertex1, vertex2 int, weight int) {
     	// update
     	g.adjacencies[vertex1][vertex2] = true
     	g.weights[vertex1][vertex2] = weight
+    	g.weights[vertex2][vertex1] = weight
     	g.edges[vertex1] = append(g.edges[vertex1], vertex2)
     	g.edges[vertex2] = append(g.edges[vertex2], vertex1)
     }
@@ -237,18 +250,14 @@ func (g *Undirected) IsConnected(vertex1, vertex2 int) bool {
  * @param   vertex1  vertex in the graph
  * @param   vertex2  vertex in the graph
  * @return  the weight of the connected edge
- *          if there is no connection -999
+ *          if there is no connection 0
  */
 func (g *Undirected) Weight(vertex1, vertex2 int) int {
-	if vertex2 > vertex1 {
-		temp := vertex1
-		vertex1 = vertex2
-		vertex2 = temp
-	}
-	if g.adjacencies[vertex1][vertex2] {
+
+	if g.adjacencies[vertex1][vertex2] || g.adjacencies[vertex2][vertex1]{
 		return g.weights[vertex1][vertex2]
 	} else {
-		return -999
+		return 0
 	}
 }
 
