@@ -168,7 +168,6 @@ func (g *Undirected) readWeightedFromFile(filepath string) {
 		}
 
 		if vertex1 >= 0 && vertex2 >= 0 {
-    		fmt.Printf("vertex1: %d, vertex 2: %d, weight: %d\n", vertex1, vertex2, weight)
 			g.AddEdgeWeight(vertex1, vertex2, weight)
 		}
 	}
