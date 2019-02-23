@@ -23,9 +23,9 @@ import (
  */
 type Undirected struct {
 	// directed    bool // TODO: add directed functionality
-	adjacencies [][]bool // adjacency matrix
-	edges       [][]int  // adjacency list
-	weights     [][]int  // adjacency list
+	adjacencies [][]bool    // adjacency matrix
+	edges       [][]int     // adjacency list
+	weights     [][]float64 // adjacency list
 	degrees     []int
 	numVertices int
 	numEdges    int
@@ -141,7 +141,8 @@ func (g *Undirected) readWeightedFromFile(filepath string) {
 	f := bufio.NewScanner(file)
 	f.Split(bufio.ScanWords)
 
-	var vertex2, weight int
+	var vertex2 int
+	var weight float64
 
 	f.Scan()
 	g.numVertices, err = strconv.Atoi(f.Text())
@@ -162,7 +163,7 @@ func (g *Undirected) readWeightedFromFile(filepath string) {
 		}
 
 		f.Scan()
-		weight, err = strconv.Atoi(f.Text())
+		weight, err = strconv.ParseFloat(f.Text(), 64)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -205,7 +206,7 @@ func (g *Undirected) AddEdge(vertex1, vertex2 int) {
  * The smaller of the inputs is added to the larger
  * vertice's list
  */
-func (g *Undirected) AddEdgeWeight(vertex1, vertex2 int, weight int) {
+func (g *Undirected) AddEdgeWeight(vertex1, vertex2 int, weight float64) {
     if vertex1 != vertex2 && !g.IsConnected(vertex1, vertex2) {
     	g.numEdges++
     	g.degrees[vertex1]++
@@ -251,7 +252,7 @@ func (g *Undirected) IsConnected(vertex1, vertex2 int) bool {
  * @return  the weight of the connected edge
  *          if there is no connection 0
  */
-func (g *Undirected) Weight(vertex1, vertex2 int) int {
+func (g *Undirected) Weight(vertex1, vertex2 int) float64 {
 
 	if g.adjacencies[vertex1][vertex2] || g.adjacencies[vertex2][vertex1]{
 		return g.weights[vertex1][vertex2]
@@ -298,11 +299,11 @@ func (g *Undirected) Clear() {
 	g.degrees = make([]int, g.numVertices)
 	g.adjacencies = make([][]bool, g.numVertices)
 	g.edges = make([][]int, g.numVertices)
-	g.weights = make([][]int, g.numVertices)
+	g.weights = make([][]float64, g.numVertices)
 
 	for i := 0; i < g.numVertices; i++ {
 		g.adjacencies[i] = make([]bool, g.numVertices)
 		g.edges[i] = []int{}
-		g.weights[i] = make([]int, g.numVertices)
+		g.weights[i] = make([]float64, g.numVertices)
 	}
 }
